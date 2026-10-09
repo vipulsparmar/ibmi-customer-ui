@@ -1,0 +1,201 @@
+{
+  "info": {
+    "_postman_id": "9b1dccff-c94a-4cf4-807c-646aa2c14e71",
+    "name": "CustomerService CRUD Automation",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "44534460",
+    "_collection_link": "https://go.postman.co/collection/44534460-9b1dccff-c94a-4cf4-807c-646aa2c14e71?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "1. POST - Create Customer",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Customer created successfully\", function () {\r\n    const resp = pm.response.json().RESPONSE;\r\n    pm.expect(resp.SUCCESS).to.eql(\"1\");\r\n    pm.expect(resp.MESSAGE).to.include(\"created successfully\");\r\n});"
+            ]
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const randId = Math.floor(2000 + Math.random() * 8000);\r\npm.collectionVariables.set(\"custId\", randId);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"CUSTID\": {{custId}},\r\n  \"NAME\": \"Express Logistics Hub\",\r\n  \"CITY\": \"Delhi\",\r\n  \"STATE\": \"DL\",\r\n  \"BALANCE\": 7500.00\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/customers",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "customers"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "2. GET - Verify Created Customer",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Customer details verified\", function () {\r\n    const resp = pm.response.json().RESPONSE;\r\n    pm.expect(resp.SUCCESS).to.eql(\"1\");\r\n    pm.expect(resp.NAME).to.eql(\"Express Logistics Hub\");\r\n    pm.expect(resp.BALANCE).to.eql(7500);\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/customers/{{custId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "customers",
+            "{{custId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "3. PUT - Update Customer",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Customer updated successfully\", function () {\r\n    const resp = pm.response.json().RESPONSE;\r\n    pm.expect(resp.SUCCESS).to.eql(\"1\");\r\n    pm.expect(resp.MESSAGE).to.include(\"updated successfully\");\r\n    pm.expect(resp.NAME).to.eql(\"Express Logistics Global\");\r\n    pm.expect(resp.BALANCE).to.eql(9500);\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"CUSTID\": {{custId}},\r\n  \"NAME\": \"Express Logistics Global\",\r\n  \"CITY\": \"Delhi\",\r\n  \"STATE\": \"DL\",\r\n  \"BALANCE\": 9500.00\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/customers/{{custId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "customers",
+            "{{custId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "4. DELETE - Remove Customer",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Customer deleted successfully\", function () {\r\n    const resp = pm.response.json().RESPONSE;\r\n    pm.expect(resp.SUCCESS).to.eql(\"1\");\r\n    pm.expect(resp.MESSAGE).to.include(\"deleted successfully\");\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/customers/{{custId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "customers",
+            "{{custId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "5. GET - Confirm Deletion",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Customer confirmed deleted (SUCCESS is 0)\", function () {\r\n    const resp = pm.response.json().RESPONSE;\r\n    pm.expect(resp.SUCCESS).to.eql(\"0\");\r\n    pm.expect(resp.MESSAGE).to.include(\"not found\");\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/customers/{{custId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "customers",
+            "{{custId}}"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": ""
+    },
+    {
+      "key": "custId",
+      "value": ""
+    }
+  ]
+}

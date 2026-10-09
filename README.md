@@ -13,41 +13,51 @@ This repository exposes an RPGLE service program (`CUSTSVC`) over HTTP using **I
 
 ## Architecture
 
-```mermaid
-C4Container
-    title Container Diagram for IBM i Modernization Architecture (C4 Level 2)
-
-    Person(developer, "Developer / QA", "Performs DB2 customer operations via browser or runs automated test suites.")
-
-    System_Boundary(c1, "Local Client Workspace") {
-        Container(nextjs_ui, "Modern Web Dashboard", "Next.js 16, React, JavaScript", "Provides interactive UI for DB2 CRUD management and proxies API calls to avoid CORS.")
-        Container(postman_suite, "Automated Test Suite", "Postman / Newman", "Executes regression suites validating HTTP contracts and RPG response payloads.")
-    }
-
-    System_Boundary(c2, "Encrypted Transport Boundary") {
-        Container(ssh_tunnel, "SSH Port Forwarding Tunnel", "OpenSSH (Port 22)", "Bridges local development ports (10010, 2001) to private IBM i host ports over an encrypted channel.")
-    }
-
-    System_Boundary(c3, "Remote IBM i Power Server") {
-        Container(iws_engine, "Integrated Web Services (IWS)", "Apache / QHTTPSVR (WSERVICES: 10010)", "Parses incoming JSON, maps payload to host parameters, and serializes RPG response structures.")
-        Container(rpg_core, "Business Logic Service Program", "ILE RPG / SQLRPGLE (DEVLIB/CUSTSVC)", "Encapsulates subprocedures: ADDCUSTOMER, GETCUSTOMERINFO, UPDATECUSTOMER, DELETECUSTOMER.")
-        ContainerDb(db2_storage, "Enterprise Database", "IBM DB2 for i (DEVLIB/CUSTMAS)", "Stores relational customer master records (CUSTID, NAME, CITY, STATE, BALANCE).")
-        Container(admin_console, "Web Administration Console", "IBM *ADMIN Server (Port 2001)", "Provides administrative lifecycle management, service deployment, and Swagger export.")
-    }
-
-    Rel(developer, nextjs_ui, "Manages customer records via", "HTTPS / Browser")
-    Rel(developer, postman_suite, "Triggers automated test suites via", "Desktop App / CLI")
-    Rel(developer, admin_console, "Configures services via", "HTTP / Browser")
-
-    Rel(nextjs_ui, ssh_tunnel, "Rewrites /api/customers to", "HTTP / Port 10010")
-    Rel(postman_suite, ssh_tunnel, "Sends CRUD requests to", "HTTP / Port 10010")
-    Rel(admin_console, ssh_tunnel, "Proxies console access to", "HTTP / Port 2001")
-
-    Rel(ssh_tunnel, iws_engine, "Forwards traffic to REST context", "HTTP / Port 10010")
-    Rel(iws_engine, rpg_core, "Invokes exported procedures with host variables", "In-Process Call")
-    Rel(rpg_core, db2_storage, "Executes transactional CRUD queries", "Embedded SQL (EXEC SQL)")
-    UpdateRelStyle(rpg_core, db2_storage, $offsetX="-30")
 ```
++---------------------------------------------------------------------------------+
+|                               CLIENT WORKSPACE                                  |
+|                                                                                 |
+|  +--------------------+         +--------------------+         +-------------+  |
+|  | Next.js Dashboard  |         |   Postman Suite    |         | Web Browser |  |
+|  | (localhost:3000)   |         | (Automated Runner) |         | (Admin UI)  |  |
+|  +---------+----------+         +---------+----------+         +------+------+  |
+|            |                              |                           |         |
+|            | (/api/customers rewrite)     |                           |         |
+|            v                              v                           v         |
+|       Local Port 10010              Local Port 10010            Local Port 2001 |
++------------+------------------------------+---------------------------+---------+
+|                              |                           |
++------------------------------+---------------------------+
+|
+[ SSH Tunnel on Port 22 ]
+|
++-------------------------------------------v-------------------------------------+
+|                                REMOTE IBM i HOST                                |
+|                                                                                 |
+|   +------------------------------------+   +---------------------------------+  |
+|   | IBM Web Administration (Port 2001) |   | Integrated Web Services (10010) |  |
+|   | Subsystem: QHTTPSVR / *ADMIN       |   | URI: /web/services/Customer...  |  |
+|   +------------------------------------+   +----------------+----------------+  |
+|                                                             |                   |
+|                                                (Calls ILE Service Program)      |
+|                                                             v                   |
+|                                            +---------------------------------+  |
+|                                            | RPGLE Service Program (CUSTSVC) |  |
+|                                            | - cust_create (INSERT)          |  |
+|                                            | - cust_get    (SELECT)          |  |
+|                                            | - cust_update (UPDATE)          |  |
+|                                            | - cust_delete (DELETE)          |  |
+|                                            +----------------+----------------+  |
+|                                                             |                   |
+|                                                    (Embedded SQL)               |
+|                                                             v                   |
+|                                            +---------------------------------+  |
+|                                            |        DB2 Physical File        |  |
+|                                            |         DEVLIB/CUSTMAS          |  |
+|                                            +---------------------------------+  |
++---------------------------------------------------------------------------------+
+```
+
 ---
 
 ## Tech Stack & Components

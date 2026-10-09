@@ -93,16 +93,41 @@ All subprocedures serialize a standard response payload returning `SUCCESS` (`1`
 
 ---
 
-## 2. REST API Endpoints (IWS)
+## 2. Integrated Web Services (IWS) REST Specifications
 
-The REST service is deployed via IBM Web Administration (`*ADMIN`) under the context root `/web/services/CustomerService` on port `10010`:
+The service program `/QSYS.LIB/DEVLIB.LIB/CUSTSVC.SRVPGM` is exposed via the native IBM i IWS runtime on instance `WSERVICES`.
 
-| HTTP Method | Endpoint URI | Operation | Mapped Subprocedure |
-| :--- | :--- | :--- | :--- |
-| **POST** | `/customers` | Create Customer | `cust_create` |
-| **GET** | `/customers/{id}` | Read Customer | `cust_get` |
-| **PUT** | `/customers/{id}` | Update Customer | `cust_update` |
-| **DELETE** | `/customers/{id}` | Delete Customer | `cust_delete` |
+### Service Runtime Profile
+* **Resource Name:** `CustomerService`
+* **Base Resource URL:** `http://127.0.0.1:10010/web/services/CustomerService`
+* **URI Path Template:** `/customers`
+* **Execution User ID:** `VIPUL13051`
+* **Library List:** `DEVLIB` prepended to user portion
+* **Startup Type:** Automatic
+* **Service Install Path:** `/www/WSERVICES/webservices/services/CustomerService`
+* **Swagger/OpenAPI Spec:** `/www/WSERVICES/webservices/services/CustomerService/META-INF/swagger.json`
+
+---
+
+### Procedure & Method Parameter Mappings
+
+| HTTP Method | Full URI Path | RPGLE Procedure | In/Out Wrappers | Input Parameter Mapping | Media Types |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **POST** | `/customers` | `ADDCUSTOMER` | **In:** `ADDCUSTOMERInput`<br>**Out:** `ADDCUSTOMERResult` | `INPUTDATA` (`struct` from JSON payload) | **In:** `*JSON`<br>**Out:** `*JSON` |
+| **GET** | `/customers/{id}` | `GETCUSTOMERINFO` | **In:** `GETCUSTOMERINFOInput`<br>**Out:** `GETCUSTOMERINFOResult` | `PCUSTID` (`int` from `*PATH_PARAM` `id`) | **In:** `*ALL`<br>**Out:** `*JSON` |
+| **PUT** | `/customers/{id}` | `UPDATECUSTOMER` | **In:** `UPDATECUSTOMERInput`<br>**Out:** `UPDATECUSTOMERResult` | `PCUSTID` (`int` from `*PATH_PARAM` `id`)<br>`INPUTDATA` (`struct` from JSON payload) | **In:** `*JSON`<br>**Out:** `*JSON` |
+| **DELETE** | `/customers/{id}` | `DELETECUSTOMER` | **In:** `DELETECUSTOMERInput`<br>**Out:** `DELETECUSTOMERResult` | `PCUSTID` (`int` from `*PATH_PARAM` `id`) | **In:** `*ALL`<br>**Out:** `*JSON` |
+
+---
+
+### Connection Pool & Environment Settings
+* **Host Server:** `localhost` (in-process job execution)
+* **Connection CCSID:** `*USERID` (EBCDIC/ASCII mapping managed automatically by IWS)
+* **Max Connections / Usage:** `*NOMAX`
+* **Inactivity Timeout:** 3600 seconds (1 hour)
+* **Max Lifetime:** 86400 seconds (24 hours)
+* **Cleanup Interval:** 300 seconds (Maintenance threads enabled)
+* **Passed Transport Metadata:** `REQUEST_METHOD`, `REQUEST_URI`, `REQUEST_URL`, `REMOTE_ADDR`, `REMOTE_USER`, `QUERY_STRING`, `SERVER_NAME`, `SERVER_PORT`
 
 ---
 

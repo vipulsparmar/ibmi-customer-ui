@@ -141,11 +141,6 @@ An automated Postman collection verifies the complete lifecycle sequentially:
 4. **`DELETE /customers/{{custId}}`** → Removes the customer record.
 5. **`GET /customers/{{custId}}`** → Verifies record no longer exists (`RESPONSE.SUCCESS === "0"`).
 
-The suite can also run headlessly via Newman:
-
-```bash
-npx newman run tests/CustomerService_tests.json
-```
 
 ---
 

@@ -78,10 +78,10 @@ The database layer runs on DB2 physical file `DEVLIB/CUSTMAS`:
 | Column Name | Data Type | Description |
 | :--- | :--- | :--- |
 | `CUSTID` | `DECIMAL(7,0)` | Unique Customer ID (Primary Key) |
-| `NAME` | `CHAR(50)` | Customer / Company Name |
-| `CITY` | `CHAR(30)` | City |
-| `STATE` | `CHAR(2)` | State Code |
-| `BALANCE` | `DECIMAL(9,2)` | Current Account Balance |
+| `NAME` | `CHAR(50)` | Customer / Company Name (Nullable) |
+| `CITY` | `CHAR(30)` | City (Nullable) |
+| `STATE` | `CHAR(2)` | State Code (Nullable) |
+| `BALANCE` | `DECIMAL(9,2)` | Current Account Balance (Nullable, PACKED 5 bytes) |
 
 Business operations are encapsulated inside service program `DEVLIB/CUSTSVC`:
 * **`cust_create`**: Executes SQL `INSERT INTO CUSTMAS`. Handles duplicate key conflicts gracefully.

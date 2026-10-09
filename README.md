@@ -75,13 +75,13 @@ This repository exposes an RPGLE service program (`CUSTSVC`) over HTTP using **I
 
 The database layer runs on DB2 physical file `DEVLIB/CUSTMAS`:
 
-| Column Name | Data Type | Description |
-| :--- | :--- | :--- |
-| `CUSTID` | `DECIMAL(7,0)` | Unique Customer ID (Primary Key) |
-| `NAME` | `CHAR(50)` | Customer / Company Name (Nullable) |
-| `CITY` | `CHAR(30)` | City (Nullable) |
-| `STATE` | `CHAR(2)` | State Code (Nullable) |
-| `BALANCE` | `DECIMAL(9,2)` | Current Account Balance (Nullable, PACKED 5 bytes) |
+| Column Name | Internal Type | SQL Type | Length / Scale | Nullable | Description |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| `CUSTID` | `ZONED` / `PACKED` | `DECIMAL(7, 0)` | 7, 0 | No (PK) | Customer Identifier |
+| `NAME` | `CHAR` | `VARCHAR` / `CHAR(50)` | 50 | Yes | Customer / Company Name |
+| `CITY` | `CHAR` | `CHAR(30)` | 30 | Yes | City |
+| `STATE` | `CHAR` | `CHAR(2)` | 2 | Yes | State Code |
+| `BALANCE` | `PACKED` | `DECIMAL(9, 2)` | 9, 2 (5 Bytes) | Yes | Current Account Balance |
 
 Business operations are encapsulated inside service program `DEVLIB/CUSTSVC`:
 * **`cust_create`**: Executes SQL `INSERT INTO CUSTMAS`. Handles duplicate key conflicts gracefully.
